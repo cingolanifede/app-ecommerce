@@ -27,18 +27,18 @@ const Banner = () => {
 
   return (
     <>
-      <div class="w-100 p-3">
+      <div className="w-100 p-3">
         {loading ? (
           <LoadingCard count={3} />
         ) : (
           <div className="row">
-            <div className="col-md-12">
+            <div className="col-md-11">
               <Carousel autoplay>
                 <div>
                   <Image
                     preview={{ visible: false }}
-                    height={260}
-                    width={1650}
+                    height={270}
+                    width={1850}
                     src={uno}
                   />
                 </div>

@@ -1,5 +1,5 @@
 const Joi = require('joi');
-
+const { errorDisplay } = require('../utils/error.handle');
 /**
  *
  * @param { email, password, name, repeatPassword } params
@@ -20,8 +20,30 @@ exports.signUpSchema = (params) => {
       const value = await schema.validateAsync(params);
       resolve(value);
     } catch (error) {
-      console.log(error.details[0].message);
-      reject({ validation: false, msg: error.details[0].message });
+      reject(errorDisplay(500, error.details[0].message));
+    }
+  });
+};
+
+/**
+ *
+ * @param { email, password } params
+ * @returns resolve or reject
+ */
+exports.loginSchema = (params) => {
+  return new Promise(async (resolve, reject) => {
+    try {
+      const schema = Joi.object().keys({
+        email: Joi.string().email().required(),
+        password: Joi.string()
+          .pattern(new RegExp('^[a-zA-Z0-9]{3,30}$'))
+          .required(),
+      });
+
+      const value = await schema.validateAsync(params);
+      resolve(value);
+    } catch (error) {
+      reject(errorDisplay(500, error.details[0].message));
     }
   });
 };

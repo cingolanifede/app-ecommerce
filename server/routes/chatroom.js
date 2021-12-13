@@ -6,6 +6,7 @@ const router = express.Router();
 const {
   getRecentConversation,
   getConversationByRoomId,
+  getRoomIdByUser,
   initiate,
   postMessage,
   markConversationReadByRoomId,
@@ -13,6 +14,7 @@ const {
 const { authCheck } = require('../middlewares/auth');
 
 router.get('/room/', authCheck, getRecentConversation);
+router.get('/room/chatroom', authCheck, getRoomIdByUser);
 router.get('/room/:roomId', authCheck, getConversationByRoomId);
 router.post('/room/initiate', authCheck, initiate);
 router.post('/room/:roomId/message', authCheck, postMessage);

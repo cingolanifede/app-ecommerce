@@ -70,7 +70,6 @@ exports.postMessage = async (req, res, next) => {
 exports.getRecentConversation = async (req, res, next) => {
   try {
     const currentLoggedUser = req.user._id;
-    console.log(req.user._id);
     const options = {
       page: parseInt(req.query.page) || 0,
       limit: parseInt(req.query.limit) || 10,
@@ -88,6 +87,45 @@ exports.getRecentConversation = async (req, res, next) => {
   } catch (error) {
     console.log(error);
     return res.status(500).json({ success: false, error: error });
+  }
+};
+
+exports.getRoomIdByUser = async (req, res, next) => {
+  try {
+    const currentLoggedUser = req.user._id;
+    const { userId, firstName } = req.query;
+
+    let rooms = await getChatRoomsByUserId(currentLoggedUser);
+
+    if (userId) {
+      let arr = [];
+      rooms.forEach((item) => {
+        const users = item.userIds.filter(
+          (el) => el._id.toString() === userId.toString()
+        );
+        if (users.length > 0) arr.push(item);
+      });
+      rooms = arr;
+    }
+
+    // LIKE SQL with node
+    if (firstName) {
+      let arr = [];
+      rooms.forEach((item) => {
+        const users = item.userIds.filter(
+          (el) =>
+            el.firstName &&
+            el.firstName.toLowerCase().includes(firstName.toLowerCase())
+        );
+        if (users.length > 0) arr.push(item);
+      });
+      rooms = arr;
+    }
+
+    return res.status(200).send({ success: true, rooms });
+  } catch (error) {
+    console.log(error);
+    return res.status(500).send({ success: false, error: error });
   }
 };
 

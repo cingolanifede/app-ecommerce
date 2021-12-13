@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from "react";
-import { getSub } from "../../functions/sub";
-import ProductCard from "../../components/cards/ProductCard";
+import React, { useState, useEffect } from 'react';
+import { getSub } from '../../functions/sub';
+import ProductCard from '../../components/cards/ProductCard';
 
 const SubHome = ({ match }) => {
   const [sub, setSub] = useState({});

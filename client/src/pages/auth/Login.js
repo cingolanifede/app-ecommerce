@@ -4,7 +4,7 @@ import { Button } from 'antd';
 import { MailOutlined, GoogleOutlined } from '@ant-design/icons';
 import { useDispatch, useSelector } from 'react-redux';
 import { Link } from 'react-router-dom';
-import { createOrUpdateUser, login } from '../../functions/auth';
+import { currentUser, login } from '../../functions/auth';
 
 const Login = ({ history }) => {
   const [email, setEmail] = useState('cingolanifede@gmail.com');
@@ -42,20 +42,21 @@ const Login = ({ history }) => {
     e.preventDefault();
     setLoading(true);
     try {
-      const result = await login(email, password);
-      if (result) {
-        dispatch({
-          type: 'LOGGED_IN_USER',
-          payload: {
-            _id: result.data.user._id,
-            email: result.data.user.email,
-            name: result.data.user.name,
-            role: result.data.user.role,
-            token: result.data.token,
-          },
-        });
-        localStorage.setItem('token', result.data.token);
-        roleBasedRedirect(result);
+      const resLogin = await login(email, password);
+      if (resLogin) {
+        localStorage.setItem('token', resLogin.data.token);
+        const result = await currentUser();
+        if (result) {
+          dispatch({
+            type: 'LOGGED_IN_USER',
+            payload: {
+              user: result.data.user,
+              role: resLogin.data.user.role,
+              token: resLogin.data.token,
+            },
+          });
+          roleBasedRedirect(result);
+        }
       }
       // history.push("/");
     } catch (error) {
@@ -65,34 +66,7 @@ const Login = ({ history }) => {
     }
   };
 
-  const googleLogin = async () => {
-    // auth
-    //   .signInWithPopup(googleAuthProvider)
-    //   .then(async (result) => {
-    //     const { user } = result;
-    //     const idTokenResult = await user.getIdTokenResult();
-    //     createOrUpdateUser(idTokenResult.token)
-    //       .then((res) => {
-    //         dispatch({
-    //           type: 'LOGGED_IN_USER',
-    //           payload: {
-    //             name: res.data.name,
-    //             email: res.data.email,
-    //             token: idTokenResult.token,
-    //             role: res.data.role,
-    //             _id: res.data._id,
-    //           },
-    //         });
-    //         roleBasedRedirect(res);
-    //       })
-    //       .catch((err) => console.log(err));
-    //     // history.push("/");
-    //   })
-    //   .catch((err) => {
-    //     console.log(err);
-    //     toast.error(err.message);
-    //   });
-  };
+  const googleLogin = async () => {};
 
   const loginForm = () => (
     <form onSubmit={handleSubmit}>

@@ -6,7 +6,14 @@ const chatRoom = require('../models/chatRoom');
  */
 exports.getChatRoomsByUserId = async (userId) => {
   try {
-    const rooms = await chatRoom.find({ userIds: { $all: [userId] } });
+    const rooms = await chatRoom
+      .find({ userIds: { $all: [userId] } })
+      .populate({
+        path: 'userIds',
+        model: 'User',
+        select: '_id role firstName lastName city',
+      })
+      .lean();
     return rooms;
   } catch (error) {
     throw error;

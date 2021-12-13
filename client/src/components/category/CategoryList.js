@@ -1,14 +1,15 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { getCategories } from '../../functions/category';
-import plumb from '../../images/plumbing.png';
-import { List, Card, Col, Row } from 'antd';
-
+// import plumb from '../../images/plumbing.png';
+import { Card, Col, Row } from 'antd';
 const { Meta } = Card;
 
 const CategoryList = () => {
   const [categories, setCategories] = useState([]);
   const [loading, setLoading] = useState(false);
+
+  const style = { background: '#0092ff', padding: '8px 0' };
 
   useEffect(() => {
     setLoading(true);
@@ -19,47 +20,38 @@ const CategoryList = () => {
   }, []);
 
   const showCategories = () => (
-    <List
-      grid={{ gutter: 16, column: 4 }}
-      dataSource={categories}
-      renderItem={(item) => (
-        <List.Item>
-          <Link to={`/category/${item.slug}`}>
+    <Row
+      justify="space-around"
+      align="middle"
+      gutter={{ xs: 8, sm: 16, md: 24, lg: 32 }}
+    >
+      {categories.map((c) => (
+        <Col key={c._id} style={{ paddingBottom: 15 }}>
+          <Link key={c._id} to={`/category/${c.slug}`}>
             <Card
               hoverable
-              style={{ width: 240 }}
-              cover={<img alt="categoria" src={plumb} />}
+              style={{ width: 240, borderRadius: 10 }}
+              cover={
+                <img
+                  alt="categoria"
+                  src="https://os.alipayobjects.com/rmsportal/QBnOOoLaAfKPirc.png"
+                />
+              }
             >
-              <Meta title={`${item.name}`} />
+              <Meta
+                style={{ textAlignVertical: 'center', textAlign: 'center' }}
+                title={`${c.name}`}
+              />
             </Card>
           </Link>
-        </List.Item>
-      )}
-    />
+        </Col>
+      ))}
+    </Row>
   );
-  // categories.map((c) => (
-  //   <div key={c._id} className="col-md-3">
-  //     <Link key={c._id} to={`/category/${c.slug}`}>
-  //       <Card
-  //         hoverable
-  //         style={{ width: 240 }}
-  //         cover={<img alt="categoria" src={plumb} />}
-  //       >
-  //         <Meta title={`${c.name}`} />
-  //       </Card>
-  //     </Link>
-  //   </div>
-  // ));
 
   return (
     <div className="container">
-      <div className="row">
-        {loading ? (
-          <h4 className="text-center">Loading...</h4>
-        ) : (
-          showCategories()
-        )}
-      </div>
+      {loading ? <h4 className="text-center">Loading...</h4> : showCategories()}
     </div>
   );
 };

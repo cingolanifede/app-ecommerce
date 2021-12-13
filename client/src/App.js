@@ -2,6 +2,7 @@ import React, { useEffect, lazy, Suspense } from 'react';
 import { Switch, Route } from 'react-router-dom';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import io from 'socket.io-client';
 
 import { currentUser } from './functions/auth';
 import { useDispatch } from 'react-redux';
@@ -19,6 +20,7 @@ const ForgotPassword = lazy(() => import('./pages/auth/ForgotPassword'));
 const History = lazy(() => import('./pages/user/History'));
 const UserRoute = lazy(() => import('./components/routes/UserRoute'));
 const AdminRoute = lazy(() => import('./components/routes/AdminRoute'));
+const ChatCard = lazy(() => import('./components/chat/ChatCard'));
 const Password = lazy(() => import('./pages/user/Password'));
 const Wishlist = lazy(() => import('./pages/user/Wishlist'));
 const AdminDashboard = lazy(() => import('./pages/admin/AdminDashboard'));
@@ -34,37 +36,38 @@ const ProductCreate = lazy(() => import('./pages/admin/product/ProductCreate'));
 const AllProducts = lazy(() => import('./pages/admin/product/AllProducts'));
 const ProductUpdate = lazy(() => import('./pages/admin/product/ProductUpdate'));
 const Product = lazy(() => import('./pages/Product'));
-const CategoryHome = lazy(() => import('./pages/category/CategoryHome'));
-const SubHome = lazy(() => import('./pages/sub/SubHome'));
+const CategoryHome = lazy(() => import('./pages/category/CategoryPpal'));
+const SubHome = lazy(() => import('./pages/sub/SubPpal'));
+
 const Shop = lazy(() => import('./pages/Shop'));
 const Cart = lazy(() => import('./pages/Cart'));
+const Chat = lazy(() => import('./pages/Chat'));
 const Checkout = lazy(() => import('./pages/Checkout'));
 const CreateCouponPage = lazy(() =>
   import('./pages/admin/coupon/CreateCouponPage')
 );
 const Payment = lazy(() => import('./pages/Payment'));
 
+const socket = io('http://localhost:5678');
+
 const App = () => {
   const dispatch = useDispatch();
 
-  useEffect(() => {
+  useEffect(async () => {
     const userToken = localStorage.getItem('token');
     if (userToken) {
       console.log('-----> ', userToken);
-      currentUser(userToken)
-        .then((res) => {
-          dispatch({
-            type: 'LOGGED_IN_USER',
-            payload: {
-              name: res.data.user.name,
-              email: res.data.user.email,
-              token: userToken,
-              role: res.data.user.role,
-              _id: res.data.user._id,
-            },
-          });
-        })
-        .catch((err) => console.log(err));
+      const result = await currentUser();
+      if (result) {
+        dispatch({
+          type: 'LOGGED_IN_USER',
+          payload: {
+            user: result.data.user,
+            role: result.data.user.role,
+            token: userToken,
+          },
+        });
+      }
     }
   }, []);
 
@@ -78,7 +81,7 @@ const App = () => {
         </div>
       }
     >
-      <Header />
+      <Header currentState={'init'} hide={false} />
       <SideDrawer />
       <ToastContainer />
       <Switch>
@@ -111,6 +114,9 @@ const App = () => {
         <Route exact path="/sub/:slug" component={SubHome} />
         <Route exact path="/shop" component={Shop} />
         <Route exact path="/cart" component={Cart} />
+        <Route exact path="/chat">
+          <Chat socket={socket} />
+        </Route>
         <UserRoute exact path="/checkout" component={Checkout} />
         <AdminRoute exact path="/admin/coupon" component={CreateCouponPage} />
         <UserRoute exact path="/payment" component={Payment} />

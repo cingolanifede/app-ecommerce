@@ -1,11 +1,7 @@
 const express = require('express');
-
 const router = express.Router();
 
-// middlewares
 const { authCheck } = require('../middlewares/auth');
-
-// controllers
 const {
   userCart,
   getUserCart,
@@ -18,10 +14,9 @@ const {
   wishlist,
   removeFromWishlist,
   createCashOrder,
-  onGetAllUsers,
-  onCreateUser,
-  onGetUserById,
-  onDeleteUserById,
+  getAllUsers,
+  getUserById,
+  deleteUserById,
 } = require('../controllers/user');
 
 router.post('/user/cart', authCheck, userCart); // save cart
@@ -33,10 +28,9 @@ router.post('/user/order', authCheck, createOrder); // stripe
 router.post('/user/cash-order', authCheck, createCashOrder); // cod
 router.get('/user/orders', authCheck, orders);
 
-router.get('/user', onGetAllUsers);
-router.post('/user', onCreateUser);
-router.get('/user/:id', onGetUserById);
-router.delete('/user/:id', onDeleteUserById);
+router.get('/user', getAllUsers);
+router.get('/user/:id', getUserById);
+router.delete('/user/:id', deleteUserById);
 
 // coupon
 router.post('/user/cart/coupon', authCheck, applyCouponToUserCart);

@@ -66,14 +66,18 @@ exports.userCart = async (req, res) => {
 };
 
 exports.getUserCart = async (req, res) => {
-  const user = await User.findOne({ email: req.user.email }).exec();
+  try {
+    const user = await User.findOne({ email: req.user.email }).exec();
 
-  let cart = await Cart.findOne({ orderdBy: user._id })
-    .populate('products.product', '_id title price totalAfterDiscount')
-    .exec();
+    let cart = await Cart.findOne({ orderdBy: user._id })
+      .populate('products.product', '_id title price totalAfterDiscount')
+      .exec();
 
-  const { products, cartTotal, totalAfterDiscount } = cart;
-  res.json({ products, cartTotal, totalAfterDiscount });
+    const { products, cartTotal, totalAfterDiscount } = cart;
+    res.json({ products, cartTotal, totalAfterDiscount });
+  } catch (error) {
+    return res.status(500).send({ success: false, error: error });
+  }
 };
 
 exports.emptyCart = async (req, res) => {
@@ -163,44 +167,60 @@ exports.createOrder = async (req, res) => {
 };
 
 exports.orders = async (req, res) => {
-  let user = await User.findOne({ email: req.user.email }).exec();
+  try {
+    let user = await User.findOne({ email: req.user.email }).exec();
 
-  let userOrders = await Order.find({ orderdBy: user._id })
-    .populate('products.product')
-    .exec();
+    let userOrders = await Order.find({ orderdBy: user._id })
+      .populate('products.product')
+      .exec();
 
-  res.json(userOrders);
+    res.json(userOrders);
+  } catch (error) {
+    return res.status(500).send({ success: false, error: error });
+  }
 };
 
 // addToWishlist wishlist removeFromWishlist
 exports.addToWishlist = async (req, res) => {
-  const { productId } = req.body;
+  try {
+    const { productId } = req.body;
 
-  const user = await User.findOneAndUpdate(
-    { email: req.user.email },
-    { $addToSet: { wishlist: productId } }
-  ).exec();
+    const user = await User.findOneAndUpdate(
+      { email: req.user.email },
+      { $addToSet: { wishlist: productId } }
+    ).exec();
 
-  res.json({ ok: true });
+    res.json({ ok: true });
+  } catch (error) {
+    return res.status(500).send({ success: false, error: error });
+  }
 };
 
 exports.wishlist = async (req, res) => {
-  const list = await User.findOne({ email: req.user.email })
-    .select('wishlist')
-    .populate('wishlist')
-    .exec();
+  try {
+    const list = await User.findOne({ email: req.user.email })
+      .select('wishlist')
+      .populate('wishlist')
+      .exec();
 
-  res.json(list);
+    res.json(list);
+  } catch (error) {
+    return res.status(500).send({ success: false, error: error });
+  }
 };
 
 exports.removeFromWishlist = async (req, res) => {
-  const { productId } = req.params;
-  const user = await User.findOneAndUpdate(
-    { email: req.user.email },
-    { $pull: { wishlist: productId } }
-  ).exec();
+  try {
+    const { productId } = req.params;
+    const user = await User.findOneAndUpdate(
+      { email: req.user.email },
+      { $pull: { wishlist: productId } }
+    ).exec();
 
-  res.json({ ok: true });
+    res.json({ ok: true });
+  } catch (error) {
+    return res.status(500).send({ success: false, error: error });
+  }
 };
 
 exports.createCashOrder = async (req, res) => {
@@ -252,7 +272,7 @@ exports.createCashOrder = async (req, res) => {
   res.json({ ok: true });
 };
 
-exports.onGetAllUsers = async (req, res) => {
+exports.getAllUsers = async (req, res) => {
   try {
     const users = await getUsers();
     return res.status(200).json({ success: true, users });
@@ -261,7 +281,7 @@ exports.onGetAllUsers = async (req, res) => {
   }
 };
 
-exports.onGetUserById = async (req, res) => {
+exports.getUserById = async (req, res) => {
   try {
     const user = await getUserById(req.params.id);
     return res.status(200).json({ success: true, user });
@@ -270,39 +290,7 @@ exports.onGetUserById = async (req, res) => {
   }
 };
 
-exports.onCreateUser = async (req, res) => {
-  try {
-    const validation = makeValidation((types) => ({
-      payload: req.body,
-      checks: {
-        firstName: { type: types.string },
-        lastName: { type: types.string },
-        type: { type: types.string, options: { enum: USER_TYPES } },
-      },
-    }));
-    if (!validation.success) return res.status(400).json({ ...validation });
-
-    /**
- *     firstName,
-      lastName,
-      type,
-      email,
-      password,
-      dni,
-      telefono,
-      address,
-      city,
-      province;
- */
-    const { firstName, lastName, type } = req.body;
-    const user = await createUser(req.body);
-    return res.status(200).json({ success: true, user });
-  } catch (error) {
-    console.log(error);
-    return res.status(500).json({ success: false, error: error });
-  }
-};
-exports.onDeleteUserById = async (req, res) => {
+exports.deleteUserById = async (req, res) => {
   try {
     const user = await deleteByUserById(req.params.id);
     return res.status(200).json({

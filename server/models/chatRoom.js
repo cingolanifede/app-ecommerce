@@ -3,6 +3,7 @@ const { v4: uuidv4 } = require('uuid');
 
 exports.CHAT_ROOM_TYPES = {
   CONSUMER_TO_CONSUMER: 'consumer-to-consumer',
+  CONSUMER_TO_PROVIDER: 'consumer-to-provider',
   CONSUMER_TO_SUPPORT: 'consumer-to-support',
 };
 

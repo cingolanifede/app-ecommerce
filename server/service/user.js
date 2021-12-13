@@ -29,6 +29,20 @@ exports.getUserById = async function (id) {
 };
 
 /**
+ * @param {String} email, user email
+ * @param {String} exclude
+ * @return {Object} User profile object
+ */
+exports.getUserByMail = async function (email, exclude) {
+  try {
+    const user = await User.findOne({ email }).select(exclude);
+    return user;
+  } catch (error) {
+    throw error;
+  }
+};
+
+/**
  * @return {Array} List of all users
  */
 exports.getUsers = async function () {

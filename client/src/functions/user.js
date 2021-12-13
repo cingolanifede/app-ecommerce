@@ -10,6 +10,17 @@ export const userCart = async (cart, authtoken) =>
 export const getUserCart = async (authtoken) =>
   await axiosInstance.get(`${process.env.REACT_APP_API}/user/cart`, {});
 
+export const getUsers = async () => {
+  const result = await axiosInstance.get(
+    `${process.env.REACT_APP_API}/user`,
+    {}
+  );
+  return {
+    type: 'ALL_USERS',
+    payload: result.data,
+  };
+};
+
 export const emptyUserCart = async (authtoken) =>
   await axiosInstance.delete(`${process.env.REACT_APP_API}/user/cart`, {});
 

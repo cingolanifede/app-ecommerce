@@ -1,3 +1,5 @@
+@import url('http://fonts.googleapis.com/css?family=Oswald:400,300,700');
+
 .slider img,
 .card-image {
   height: 450px;
@@ -6,4 +8,24 @@
 
 .pointer {
   cursor: pointer;
+}
+
+.custom-footer {
+  margin-top: 1rem;
+  padding: 1rem;
+  background-color: rgb(235, 195, 64);
+  /* position: fixed; */
+  bottom: 0;
+  left: 0;
+  width: 100%;
+}
+.site-page-header {
+  border: 1px solid rgb(235, 237, 240);
+}
+.logo {
+  width: 50%;
+  height: 31px;
+  /* background: #333; */
+  margin: 16px 0px 16px 0;
+  float: left;
 }

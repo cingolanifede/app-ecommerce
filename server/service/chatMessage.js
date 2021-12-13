@@ -89,7 +89,7 @@ exports.getConversationByRoomId = async (chatRoomId, options = {}) => {
       { $sort: { createdAt: -1 } },
       // do a join on another table called users, and
       // get me a user whose _id = postedByUser
-      /*      {
+      {
         $lookup: {
           from: 'users',
           localField: 'postedByUser',
@@ -97,8 +97,25 @@ exports.getConversationByRoomId = async (chatRoomId, options = {}) => {
           as: 'postedByUser',
         },
       },
+      {
+        $project: {
+          _id: 1,
+          chatRoomId: 1,
+          message: 1,
+          'postedByUser._id': 1,
+          'postedByUser.role': 1,
+          'postedByUser.firstName': 1,
+          'postedByUser.lastName': 1,
+          'postedByUser.city': 1,
+          readByRecipients: 1,
+          type: 1,
+          createdAt: 1,
+          updatedAt: 1,
+        },
+      },
+
       { $unwind: '$postedByUser' },
-      */
+
       // apply pagination
       { $skip: options.page * options.limit },
       { $limit: options.limit },

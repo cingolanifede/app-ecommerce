@@ -1,58 +1,48 @@
-const User = require('../models/user');
 const bcrypt = require('bcrypt');
-const { signUpSchema } = require('../validations/user.validation');
+const { signUpSchema, loginSchema } = require('../validations/user.validation');
 const { generateToken } = require('../validations/token.validation');
-
-exports.createOrUpdateUser = async (req, res) => {
-  const { name, picture, email } = req.user;
-
-  const user = await User.findOneAndUpdate(
-    { email },
-    { name: email.split('@')[0], picture },
-    { new: true }
-  );
-  if (user) {
-    console.log('USER UPDATED', user);
-    res.json(user);
-  } else {
-    const newUser = await new User({
-      name: email.split('@')[0],
-      picture,
-    }).save();
-    console.log('USER CREATED', newUser);
-    res.json(newUser);
-  }
-};
+const { getUserByMail, createUser } = require('../service/user');
+const { errorHandler, errorDisplay } = require('../utils/error.handle');
 
 exports.currentUser = async (req, res, next) => {
   try {
     const { email } = req.user;
-    const user = await User.findOne({ email }).select('-password');
-    if (!user) throw new Error('User not found');
+    const user = await getUserByMail(email, `-password`);
+    if (!user) throw errorDisplay(404, 'User not found');
+
     return res.status(200).send({ user });
   } catch (error) {
-    next(error);
+    return errorHandler(error, res);
   }
 };
 
 exports.login = async (req, res, next) => {
   try {
     const { email, password } = req.body;
+    await loginSchema({ email, password });
 
-    let user = await User.findOne({ email });
-    const isPasswordMatching = await bcrypt.compare(password, user.password);
+    let userLogged = await getUserByMail(email, null);
+    if (!userLogged) throw errorDisplay(404, 'User not found');
+
+    const isPasswordMatching = await bcrypt.compare(
+      password,
+      userLogged.password
+    );
 
     if (!isPasswordMatching) {
       return res
         .status(401)
         .send({ error: { validation: false, msg: 'unauthorized' } });
     }
-    const token = await generateToken(user);
-    user.password = undefined;
+    const token = await generateToken(userLogged);
+    userLogged.password = undefined;
+
+    const { _id, role, type } = userLogged;
+
+    const user = { _id, role, email, type };
     return res.status(200).send({ user, token });
   } catch (error) {
-    console.log(error);
-    next(error);
+    return errorHandler(error, res);
   }
 };
 
@@ -62,21 +52,24 @@ exports.signUp = async (req, res, next) => {
 
     await signUpSchema({ email, password, firstName, repeatPassword });
 
-    const user = await User.findOne({ email });
-    if (user) res.status(409).send('Email exits');
+    const user = await getUserByMail(email);
+    if (user) throw errorDisplay(409, 'Email exits');
 
     const hashedPassword = await bcrypt.hash(password, 10);
-    const createdUser = await User.create({
+    const createdUser = await createUser({
       ...req.body,
       password: hashedPassword,
     });
     res.status(200).send(createdUser);
   } catch (error) {
-    next(error);
+    return errorHandler(error, res);
   }
 };
 
-/******************************* */
-exports.logout = async (req, res) => {
-  const { email } = req.body;
+exports.logout = async (req, res, next) => {
+  try {
+    const { email } = req.body;
+  } catch (error) {
+    return errorHandler(error, res);
+  }
 };

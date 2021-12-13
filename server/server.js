@@ -8,8 +8,6 @@ const { readdirSync } = require('fs');
 const { dbConnection } = require('./config/db');
 const { socketConnection } = require('./socket/socket-connection');
 
-const WebSockets = require('./socket/WebSockets');
-
 // Base de datos
 dbConnection();
 
@@ -30,7 +28,10 @@ readdirSync('./routes').map((r) => app.use('/api', require('./routes/' + r)));
 
 //Error
 const errorHandler = (err, req, res, next) => {
-  res.status(500).send({ error: err });
+  console.log(JSON.stringify(err));
+  res
+    .status(500)
+    .send({ error: typeof err.message !== 'undefined' ? err.message : err });
 };
 
 app.use(errorHandler);

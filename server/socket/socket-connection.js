@@ -22,6 +22,49 @@ const socketConnection = (server) => {
   io.on('connection', (socket) => {
     console.log('a user connected ');
 
+    //for a new user joining the room
+    socket.on('joinRoom', ({ username, roomname }) => {
+      //* create user
+      users.push({
+        socketId: socket.id,
+        userId: username,
+        roomname,
+      });
+      console.log(users);
+      socket.join(roomname);
+
+      //display a welcome message to the user who have joined a room
+      socket.emit('message', {
+        userId: username,
+        username,
+        text: `Welcome ${username}`,
+      });
+
+      //displays a joined room message to all other room users except that particular user
+      socket.broadcast.to(roomname).emit('message', {
+        userId: username,
+        username,
+        text: `${username} has joined the chat`,
+      });
+    });
+
+    socket.on('sendMessage', (text) => {
+      console.log(text);
+      socket.emit('outputMessage', text);
+    });
+
+    //user sending message
+    socket.on('chat', (text) => {
+      //gets the room user and the message sent
+      const userConnection = users.find((u) => u.socketId === socket.id);
+      console.log('connection data --- > ', userConnection);
+      io.to(userConnection.roomname).emit('message', {
+        userId: userConnection.socketId,
+        username: userConnection.username,
+        text: text,
+      });
+    });
+
     // event fired when the chat room is disconnected
     socket.on('disconnect', () => {
       console.log('user disconnected');
