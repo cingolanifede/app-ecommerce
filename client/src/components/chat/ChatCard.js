@@ -3,7 +3,7 @@ import moment from 'moment';
 import { Comment, Tooltip, Avatar, Image } from 'antd';
 
 const ChatCard = (props) => {
-  console.log('CARDS :', props);
+  console.log('ChatCards :', props);
   return (
     <div style={{ width: '100%' }}>
       <Comment

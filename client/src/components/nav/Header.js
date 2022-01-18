@@ -8,6 +8,7 @@ import {
   UserAddOutlined,
   LogoutOutlined,
   MessageOutlined,
+  MenuOutlined,
 } from '@ant-design/icons';
 import { useDispatch, useSelector } from 'react-redux';
 import { useHistory, Link } from 'react-router-dom';
@@ -23,11 +24,11 @@ const HeaderNav = ({ hide, currentState }) => {
 
   const location = useLocation();
 
-  useEffect(() => {
-    console.log(location);
-    if (location.state) setHideBar(location.state.hide);
-    if (location.state) setCurrent(location.state.currentState);
-  }, [location]);
+  // useEffect(() => {
+  //   console.log(location);
+  //   if (location.state) setHideBar(location.state.hide);
+  //   if (location.state) setCurrent(location.state.currentState);
+  // }, [location]);
 
   let dispatch = useDispatch();
   let { user, cart } = useSelector((state) => ({ ...state }));
@@ -112,18 +113,18 @@ const HeaderNav = ({ hide, currentState }) => {
       {user && (
         <SubMenu
           key="SubMenu"
-          icon={<SettingOutlined />}
+          icon={<UserOutlined />}
           title={user.email && user.email.split('@')[0]}
           className="float-right"
         >
           {user && user.role === 'subscriber' && (
-            <Menu.Item key="subscriber">
+            <Menu.Item key="subscriber" icon={<MenuOutlined />}>
               <Link to="/user/history">Dashboard</Link>
             </Menu.Item>
           )}
 
           {user && user.role === 'admin' && (
-            <Menu.Item key="admin">
+            <Menu.Item key="admin" icon={<MenuOutlined />}>
               <Link to="/admin/dashboard">Dashboard</Link>
             </Menu.Item>
           )}

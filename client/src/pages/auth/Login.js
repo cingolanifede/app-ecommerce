@@ -108,7 +108,7 @@ const Login = ({ history }) => {
   );
 
   return (
-    <div className="container p-5">
+    <div className="container p-5" style={{ marginTop: '5%' }}>
       <div className="row">
         <div className="col-md-6 offset-md-3">
           {loading ? (

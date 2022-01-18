@@ -38,6 +38,15 @@ export const getChatRooms = async () => {
   };
 };
 
+export const postChatMessage = async (chatRoomId, messageText) => {
+  await axiosInstance.post(
+    `${process.env.REACT_APP_API}/room/${chatRoomId}/message`,
+    messageText,
+    {}
+  );
+};
+// {{API}}/room/61e71284450e5406ecc1931e/message
+
 export const uploadFile = async (formData) => {
   return await axiosInstance.post(
     `${process.env.REACT_APP_API}/chat/uploadfiles`,

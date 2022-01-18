@@ -16,6 +16,8 @@ import {
   // afterPostMessage,
   uploadFile,
   getChatRooms,
+  postChatMessage,
+  getChatsByRoomId,
   // getChatsByRoomId,
 } from '../functions/chat';
 import { getUsers } from '../functions/user';
@@ -31,7 +33,8 @@ const ChatPage = (props) => {
 
   // redux
   const { chats, rooms, user, users } = useSelector((state) => ({ ...state }));
-
+  // console.log('Chats -- rooms: ', rooms)
+  console.log('Chats -- rooms: ', chats, rooms, user, users)
   useEffect(async () => {
     dispatch(await getChatRooms());
     dispatch(await getUsers());
@@ -77,28 +80,32 @@ const ChatPage = (props) => {
     }
   };
 
-  const submitChatMessage = (e) => {
+  const submitChatMessage = async (e) => {
     e.preventDefault();
     const { _id, firstName, lastName, role, email, image } = user.user;
     const message = state;
     const type = 'Text';
-
-    if (!message || /^\s*$/.test(message)) return;
-    const data = {
-      message,
-      postedByUser: {
-        _id,
-        firstName,
-        lastName,
-        email,
-        image,
-      },
-      role,
-      nowTime: moment(),
-      type,
-    };
-    console.log('::::::::::::::', data);
-    socket.emit('sendMessage', data);
+    /*
+        if (!message || /^\s*$/.test(message)) return;
+        const data = {
+          message,
+          postedByUser: {
+            _id,
+            firstName,
+            lastName,
+            email,
+            image,
+          },
+          role,
+          nowTime: moment(),
+          type,
+        };
+        console.log('::::::::::::::', data);
+        socket.emit('sendMessage', data);
+    */
+    const chatRoomId = localStorage.getItem('chatRoomId');
+    postChatMessage(chatRoomId, message)
+    dispatch(await getChatsByRoomId(chatRoomId));
     setState({ chatMessage: '' });
   };
 
@@ -111,7 +118,7 @@ const ChatPage = (props) => {
         {/* {users && renderUserList()} */}
         {rooms && renderRoomList()}
       </div>
-      {rooms.length > 0 ? (
+      {rooms.rooms && rooms.rooms.length > 0 ? (
         <div style={{ maxWidth: '600px', margin: '0 auto' }}>
           <div
             className="infinite-container"
@@ -165,7 +172,7 @@ const ChatPage = (props) => {
           <br></br>
         </div>
       ) : (
-        <p></p>
+        <p>empty</p>
       )}
     </>
   );
