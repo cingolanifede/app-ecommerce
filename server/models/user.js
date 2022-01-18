@@ -67,6 +67,10 @@ const userSchema = new mongoose.Schema(
     type: {
       type: String,
     },
+    status: {
+      type: String,
+      default: 'pending'
+    },
     cart: {
       type: Array,
       default: [],

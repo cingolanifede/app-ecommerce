@@ -3,6 +3,7 @@ const { signUpSchema, loginSchema } = require('../validations/user.validation');
 const { generateToken } = require('../validations/token.validation');
 const { getUserByMail, createUser } = require('../service/user');
 const { errorHandler, errorDisplay } = require('../utils/error.handle');
+const { sendContactMail } = require('../service/contact');
 
 exports.currentUser = async (req, res, next) => {
   try {
@@ -23,7 +24,9 @@ exports.login = async (req, res, next) => {
 
     let userLogged = await getUserByMail(email, null);
     if (!userLogged) throw errorDisplay(404, 'User not found');
-
+    if (userLogged.status === 'pending') {
+      console.log('Falta validar cuenta')
+    }
     const isPasswordMatching = await bcrypt.compare(
       password,
       userLogged.password
@@ -60,6 +63,9 @@ exports.signUp = async (req, res, next) => {
       ...req.body,
       password: hashedPassword,
     });
+    /**send email */
+    await sendContactMail(req.body);
+
     res.status(200).send(createdUser);
   } catch (error) {
     return errorHandler(error, res);

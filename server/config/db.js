@@ -1,8 +1,9 @@
 const mongoose = require('mongoose');
-
+const { configuration } = require('./config')
 const dbConnection = async () => {
   try {
-    const url = `${process.env.DATABASE}?authSource=admin`;
+    const url = `mongodb://${configuration.mainDatabase.user}:${configuration.mainDatabase.pass}@${configuration.mainDatabase.host}:${configuration.mainDatabase.port}/${configuration.mainDatabase.name}?authSource=admin`
+    console.log(url)
     await mongoose.connect(url, {
       useCreateIndex: true,
       useNewUrlParser: true,
