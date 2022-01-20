@@ -15,7 +15,8 @@ const SearchBar = () => {
         justify="space-around"
         align="middle"
       >
-        <Col span={12}>
+        <Col span={24}
+          gutter={{ xs: 8, sm: 16, md: 24, lg: 32 }}>
           <div className="p-5 w-90">
             <h1>
               Encontrá los profesionales y expertos de confianza que necesitás
@@ -31,15 +32,16 @@ const SearchBar = () => {
             />
           </div>
         </Col>
-        <Col
+        {/* <Col
           span={12}
           style={{ textAlignVertical: 'center', textAlign: 'center' }}
+          gutter={{ xs: 8, sm: 16, md: 24, lg: 32 }}
         >
           <img
             className="img-fluid"
             src={require('../../images/home_hero.png')}
           />
-        </Col>
+        </Col> */}
       </Row>
     </>
   );

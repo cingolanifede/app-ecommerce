@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Form, Input, Button, Row, Col } from 'antd';
+import { Form, Input, Button, Row, Col, Empty } from 'antd';
 import {
   EnterOutlined,
   MessageTwoTone,
@@ -33,8 +33,9 @@ const ChatPage = (props) => {
 
   // redux
   const { chats, rooms, user, users } = useSelector((state) => ({ ...state }));
-  // console.log('Chats -- rooms: ', rooms)
-  console.log('Chats -- rooms: ', chats, rooms, user, users)
+  // console.log('Chats -- rooms: ', chats)
+  const roomId = chats && chats.roomId; //selected roomId
+
   useEffect(async () => {
     dispatch(await getChatRooms());
     dispatch(await getUsers());
@@ -103,9 +104,10 @@ const ChatPage = (props) => {
         console.log('::::::::::::::', data);
         socket.emit('sendMessage', data);
     */
-    const chatRoomId = localStorage.getItem('chatRoomId');
-    postChatMessage(chatRoomId, message)
-    dispatch(await getChatsByRoomId(chatRoomId));
+    // chatRoomId = localStorage.getItem('chatRoomId');
+    console.log(roomId)
+    postChatMessage(roomId, message)
+    dispatch(await getChatsByRoomId(roomId));
     setState({ chatMessage: '' });
   };
 
@@ -114,66 +116,68 @@ const ChatPage = (props) => {
       <div>
         <p style={{ fontSize: '2rem', textAlign: 'center' }}> Chat</p>
       </div>
-      <div style={{ paddingLeft: '20px', width: '15%' }}>
+      <div style={{ paddingLeft: '20px', width: '15%', paddingTop: '50px', position: 'absolute' }}>
         {/* {users && renderUserList()} */}
+        <p>Chat Rooms</p>
         {rooms && renderRoomList()}
       </div>
-      {rooms.rooms && rooms.rooms.length > 0 ? (
-        <div style={{ maxWidth: '600px', margin: '0 auto' }}>
-          <div
-            className="infinite-container"
-            style={{ height: '400px', overflowY: 'scroll' }}
-          >
-            {chats && renderCards()}
-            <div style={{ float: 'left', clear: 'both' }} />
+      {
+        roomId && rooms.rooms && rooms.rooms.length > 0 ? (
+          <div style={{ maxWidth: '600px', margin: '0 auto', paddingTop: '50px' }}>
+            <div style={{ height: '600px', overflowY: 'scroll' }}>
+              {chats && renderCards()}
+              <div style={{ float: 'left', clear: 'both' }} />
+            </div>
+
+            <Row>
+              <Form layout="inline" onSubmit={submitChatMessage}>
+                <Col style={{ width: 400 }}>
+                  <Input
+                    size="large"
+                    id="message"
+                    prefix={<MessageTwoTone />}
+                    placeholder="Escibe un mensaje aqui"
+                    type="text"
+                    value={state.chatMessage}
+                    onChange={hanleSearchChange}
+                  />
+                </Col>
+                <Col>
+                  <Dropzone onDrop={onDrop}>
+                    {({ getRootProps, getInputProps }) => (
+                      <section>
+                        <div {...getRootProps()}>
+                          <input {...getInputProps()} />
+                          <Button size="large">
+                            <UploadOutlined />
+                          </Button>
+                        </div>
+                      </section>
+                    )}
+                  </Dropzone>
+                </Col>
+
+                <Col>
+                  <Button
+                    size="large"
+                    type="primary"
+                    style={{ width: '100%' }}
+                    onClick={submitChatMessage}
+                    htmlType="submit"
+                  >
+                    <EnterOutlined />
+                  </Button>
+                </Col>
+              </Form>
+            </Row>
+            <br></br>
           </div>
-
-          <Row>
-            <Form layout="inline" onSubmit={submitChatMessage}>
-              <Col style={{ width: 400 }}>
-                <Input
-                  size="large"
-                  id="message"
-                  prefix={<MessageTwoTone />}
-                  placeholder="Escibe un mensaje aqui"
-                  type="text"
-                  value={state.chatMessage}
-                  onChange={hanleSearchChange}
-                />
-              </Col>
-              <Col>
-                <Dropzone onDrop={onDrop}>
-                  {({ getRootProps, getInputProps }) => (
-                    <section>
-                      <div {...getRootProps()}>
-                        <input {...getInputProps()} />
-                        <Button size="large">
-                          <UploadOutlined />
-                        </Button>
-                      </div>
-                    </section>
-                  )}
-                </Dropzone>
-              </Col>
-
-              <Col>
-                <Button
-                  size="large"
-                  type="primary"
-                  style={{ width: '100%' }}
-                  onClick={submitChatMessage}
-                  htmlType="submit"
-                >
-                  <EnterOutlined />
-                </Button>
-              </Col>
-            </Form>
-          </Row>
-          <br></br>
-        </div>
-      ) : (
-        <p>empty</p>
-      )}
+        ) : (
+          <div style={{ paddingTop: '15%' }} >
+            <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description="Selecciona un chat room para ver los mensajes" />
+          </div>
+        )
+      }
     </>
   );
 };

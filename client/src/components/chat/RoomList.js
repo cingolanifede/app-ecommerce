@@ -9,9 +9,10 @@ const RoomList = (props) => {
   const dispatch = useDispatch();
 
   const handleClick = async (item) => {
-    console.log('click en room -->', item);
+    // console.log('click en room -->', item);
     dispatch(await getChatsByRoomId(item._id));
-    localStorage.setItem('chatRoomId', item._id);
+    dispatch({ type: 'ROOM_ID', payload: item._id });
+    // localStorage.setItem('chatRoomId', item._id);
   };
 
   return (

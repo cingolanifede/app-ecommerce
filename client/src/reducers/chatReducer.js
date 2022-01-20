@@ -6,6 +6,8 @@ export const chatReducer = (state = {}, action) => {
       return { ...state, chats: state.chats.concat(action.payload) };
     case 'GET_ROOMS':
       return { ...state, rooms: action.payload };
+    case 'ROOM_ID':
+        return { ...state, roomId: action.payload };
     default:
       return state;
   }

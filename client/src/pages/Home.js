@@ -4,6 +4,7 @@ import BackToTop from '../components/home/BackToTop';
 import SearchBar from '../components/home/SearchBar';
 import FooterNav from '../components/nav/Footer';
 import { Carousel } from 'antd';
+import SubHeader from './SubHeader';
 
 // import SubList from '../components/sub/SubList';
 // import Jumbotron from '../components/cards/Jumbotron';
@@ -22,7 +23,8 @@ const Home = () => {
   };
   return (
     <>
-      <SearchBar />
+    <SubHeader/>
+      {/* <SearchBar /> */}
       <h1
         style={{ fontFamily: 'Oswald', fontSize: '4rem' }}
         className="text-center p-3 mt-5 mb-5 display-4"
